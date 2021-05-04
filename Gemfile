@@ -54,3 +54,9 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+gem 'acts-as-taggable-on', '~> 7.0'
+gem 'sidekiq'
+gem 'redis'
+gem 'hiredis' # faster Redis client, refer Rails 5 guide
+gem 'devise'

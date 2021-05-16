@@ -61,3 +61,6 @@ gem 'redis'
 gem 'hiredis' # faster Redis client, refer Rails 5 guide
 gem 'devise'
 gem 'annotate'
+
+gem 'jwt'
+gem 'rack-cors', :require => 'rack/cors'

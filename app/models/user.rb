@@ -5,6 +5,7 @@
 #  id                     :bigint           not null, primary key
 #  email                  :string(255)      default(""), not null
 #  encrypted_password     :string(255)      default(""), not null
+#  name                   :string(255)
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string(255)
@@ -22,4 +23,13 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+
+  validates :name, uniqueness: { case_sensitive: false },
+                   presence: true,
+                   allow_blank: false,
+                   format: { with: /\A[a-zA-Z0-9]+\z/ }
+
+  def generate_jwt
+    JWT.encode({ id: id, exp: 60.days.from_now.to_i }, Rails.application.secrets.secret_key_base)
+  end
 end

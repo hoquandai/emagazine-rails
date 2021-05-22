@@ -21,8 +21,24 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Question < ApplicationRecord
+  acts_as_taggable
+
   belongs_to :category
   belongs_to :user
+  has_many :votes, as: :votable
 
-  acts_as_taggable
+  scope :hot, lambda {
+    Question.left_joins(:votes).group(:id).order('COUNT(votes.votable_id) DESC')
+  }
+
+  def as_json
+    {
+      id: id,
+      content: content,
+      created_at: created_at,
+      creator: user,
+      category: category,
+      tags: tags
+    }
+  end
 end

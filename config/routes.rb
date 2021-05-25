@@ -11,5 +11,10 @@ Rails.application.routes.draw do
         get :hot
       end
     end
+    resources :votes do
+      collection do
+        delete :remove
+      end
+    end
   end
 end

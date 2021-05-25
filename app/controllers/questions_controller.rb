@@ -12,17 +12,23 @@ class QuestionsController < ApplicationController
   end
 
   def show
-    question = Question.find_by(id: params[:id]).as_json
+    authenticate_user if params[:authenticated]
+    question = Question.find_by(id: params[:id])
+    liked = Vote.exists?(voter_id: @current_user_id, votable: question)
     if question
-      render_ok(data: question)
+      render_ok(data: question.as_json.merge(liked: liked))
     else
       render_error(message: 'Not Found', status: 404)
     end
   end
 
   def latest
+    authenticate_user if params[:authenticated]
     questions = Question.limit(4).order(created_at: :desc)
-    render_ok(data: questions)
+    likes = Vote.where(voter_id: @current_user_id)
+    data = { questions: questions, likes: likes.pluck(:votable_id) }
+    p data
+    render_ok(data: data)
   end
 
   def trending_tags

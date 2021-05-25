@@ -31,14 +31,15 @@ class Question < ApplicationRecord
     Question.left_joins(:votes).group(:id).order('COUNT(votes.votable_id) DESC')
   }
 
-  def as_json
+  def as_json(data = {})
     {
       id: id,
       content: content,
       created_at: created_at,
       creator: user,
       category: category,
-      tags: tags
+      tags: tags,
+      likes: votes.size
     }
   end
 end

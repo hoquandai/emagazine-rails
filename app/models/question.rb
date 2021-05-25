@@ -26,6 +26,7 @@ class Question < ApplicationRecord
   belongs_to :category
   belongs_to :user
   has_many :votes, as: :votable
+  has_many :comments
 
   scope :hot, lambda {
     Question.left_joins(:votes).group(:id).order('COUNT(votes.votable_id) DESC')

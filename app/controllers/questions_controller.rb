@@ -16,7 +16,7 @@ class QuestionsController < ApplicationController
     question = Question.find_by(id: params[:id])
     liked = Vote.exists?(voter_id: @current_user_id, votable: question)
     if question
-      render_ok(data: question.as_json.merge(liked: liked))
+      render_ok(data: question.as_json.merge(liked: liked, comments: question.comments))
     else
       render_error(message: 'Not Found', status: 404)
     end

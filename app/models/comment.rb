@@ -23,4 +23,15 @@
 class Comment < ApplicationRecord
   belongs_to :question
   belongs_to :user
+
+  def as_json(data = {})
+    {
+      id: id,
+      content: content,
+      excerpt: excerpt,
+      created_at: created_at,
+      creator: user,
+      question: question
+    }
+  end
 end

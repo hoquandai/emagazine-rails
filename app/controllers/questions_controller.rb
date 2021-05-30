@@ -27,7 +27,6 @@ class QuestionsController < ApplicationController
     questions = Question.limit(4).order(created_at: :desc)
     likes = Vote.where(voter_id: @current_user_id)
     data = { questions: questions, likes: likes.pluck(:votable_id) }
-    p data
     render_ok(data: data)
   end
 
@@ -49,9 +48,25 @@ class QuestionsController < ApplicationController
     end
   end
 
+  def category
+    authenticate_user if params[:authenticated]
+    questions = Question.where(category_id: params[:id])
+    likes = Vote.where(voter_id: @current_user_id, votable_id: questions.ids)
+    data = { questions: questions, likes: likes.pluck(:votable_id) }
+    render_ok(data: data)
+  end
+
+  def tag
+    authenticate_user if params[:authenticated]
+    questions = Question.tagged_with(params[:tag])
+    likes = Vote.where(voter_id: @current_user_id, votable_id: questions.ids)
+    data = { questions: questions, likes: likes.pluck(:votable_id) }
+    render_ok(data: data)
+  end
+
   private
 
   def question_params
-    params.require(:question).permit(:content, :category_id, :user_id, :tag_list)
+    params.require(:question).permit(:excerpt, :content, :category_id, :user_id, :tag_list)
   end
 end

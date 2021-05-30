@@ -4,6 +4,7 @@
 #
 #  id          :bigint           not null, primary key
 #  content     :text(65535)
+#  excerpt     :string(255)
 #  visible     :boolean
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
@@ -35,6 +36,7 @@ class Question < ApplicationRecord
   def as_json(data = {})
     {
       id: id,
+      excerpt: excerpt,
       content: content,
       created_at: created_at,
       creator: user,

@@ -10,6 +10,8 @@ Rails.application.routes.draw do
         get :latest
         get :trending_tags
         get :hot
+        get :category
+        get :tag
       end
     end
     resources :votes do

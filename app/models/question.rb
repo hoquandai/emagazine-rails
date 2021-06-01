@@ -33,6 +33,10 @@ class Question < ApplicationRecord
     Question.left_joins(:votes).group(:id).order('COUNT(votes.votable_id) DESC')
   }
 
+  scope :interactive, lambda {
+    Question.left_joins(:comments).group(:id).order('COUNT(comments.question_id) DESC')
+  }
+
   def as_json(data = {})
     {
       id: id,

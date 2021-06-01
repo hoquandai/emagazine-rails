@@ -16,6 +16,21 @@
 #  index_votes_on_voter    (voter_type,voter_id)
 #
 class Vote < ApplicationRecord
+  after_create :increase_score
+  after_destroy :decrease_score
+
   belongs_to :voter, polymorphic: true
   belongs_to :votable, polymorphic: true
+
+  private
+
+  def increase_score
+    votable.user.score = votable.user.score + 1
+    votable.user.save
+  end
+
+  def decrease_score
+    votable.user.score = votable.user.score - 1
+    votable.user.save
+  end
 end

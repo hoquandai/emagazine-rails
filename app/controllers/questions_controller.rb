@@ -48,6 +48,15 @@ class QuestionsController < ApplicationController
     end
   end
 
+  def interactive
+    questions = Question.interactive.limit(5)
+    if questions
+      render_ok(data: questions)
+    else
+      render_error(message: 'Bad Request', status: 400)
+    end
+  end
+
   def category
     authenticate_user if params[:authenticated]
     questions = Question.where(category_id: params[:id])

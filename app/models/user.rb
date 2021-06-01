@@ -30,6 +30,9 @@ class User < ApplicationRecord
                    presence: true,
                    allow_blank: false,
                    format: { with: /\A[a-zA-Z0-9]+\z/ }
+  scope :top_ranking, lambda {
+    order(score: :desc).limit(5)
+  }
 
   def generate_jwt
     JWT.encode({ id: id, exp: 60.days.from_now.to_i }, Rails.application.secrets.secret_key_base)

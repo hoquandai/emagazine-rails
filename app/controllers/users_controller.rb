@@ -9,12 +9,16 @@ class UsersController < ApplicationController
   end
 
   def update
-    puts current_user.inspect
     if current_user.update(user_params)
       render :show
     else
       render json: { errors: current_user.errors }, status: :unprocessable_entity
     end
+  end
+
+  def ranking
+    users = User.top_ranking
+    render_ok(data: users)
   end
 
   protected

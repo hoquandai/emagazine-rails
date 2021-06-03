@@ -5,7 +5,8 @@ class UsersController < ApplicationController
     user = User.find_by(id: params[:id])
     questions = user.questions
     votes = Vote.where(votable_type: 'Question', votable_id: questions.ids).size
-    render_ok(data: { user: user, questions: questions, stars: votes })
+    puts "=========", { user: user.as_json, questions: questions, stars: votes }
+    render_ok(data: { user: user.as_json, questions: questions, stars: votes })
   end
 
   def update
@@ -24,6 +25,6 @@ class UsersController < ApplicationController
   protected
 
   def user_params
-    params.require(:user).permit(:name, :password, :email)
+    params.require(:user).permit(:name, :password, :email, :avatar)
   end
 end

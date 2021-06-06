@@ -22,12 +22,16 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Question < ApplicationRecord
+  include Rails.application.routes.url_helpers
+  DEFAULT_IMAGE = ActionController::Base.helpers.asset_path 'img04.jpg'
+
   acts_as_taggable
 
   belongs_to :category
   belongs_to :user
   has_many :votes, as: :votable
   has_many :comments
+  has_one_attached :image
 
   scope :hot, lambda {
     Question.left_joins(:votes).group(:id).order('COUNT(votes.votable_id) DESC')
@@ -46,7 +50,8 @@ class Question < ApplicationRecord
       creator: user,
       category: category,
       tags: tags,
-      likes: votes.size
+      likes: votes.size,
+      image: image.attached? ? rails_blob_path(image, only_path: true) : DEFAULT_IMAGE
     }
   end
 end

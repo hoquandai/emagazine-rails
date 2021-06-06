@@ -57,6 +57,16 @@ class QuestionsController < ApplicationController
     end
   end
 
+  def top_tagging
+    tag_names = ActsAsTaggableOn::Tag.most_used(1).map(&:name)
+    questions = Question.tagged_with(tag_names).limit(4)
+    if questions
+      render_ok(data: questions)
+    else
+      render_error(message: 'Bad Request', status: 400)
+    end
+  end
+
   def category
     authenticate_user if params[:authenticated]
     questions = Question.where(category_id: params[:id])
@@ -76,6 +86,6 @@ class QuestionsController < ApplicationController
   private
 
   def question_params
-    params.require(:question).permit(:excerpt, :content, :category_id, :user_id, :tag_list)
+    params.require(:question).permit(:excerpt, :content, :category_id, :user_id, :tag_list, :image)
   end
 end

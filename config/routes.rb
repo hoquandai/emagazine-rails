@@ -7,8 +7,12 @@ Rails.application.routes.draw do
         get :ranking
       end
     end
-    resources :categories
     resources :comments
+    resources :categories do
+      collection do
+        get :groups
+      end
+    end
     resources :questions do
       collection do
         get :latest
@@ -17,6 +21,7 @@ Rails.application.routes.draw do
         get :category
         get :tag
         get :interactive
+        get :top_tagging
       end
     end
     resources :votes do

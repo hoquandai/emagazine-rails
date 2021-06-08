@@ -29,7 +29,7 @@ class Comment < ApplicationRecord
       id: id,
       content: content,
       excerpt: excerpt,
-      created_at: created_at,
+      created_at: created_at.strftime('%H:%M %d %B, %Y'),
       creator: user,
       question: question
     }

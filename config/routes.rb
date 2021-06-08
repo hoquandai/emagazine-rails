@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       end
     end
     resources :comments
+    resources :tags
     resources :categories do
       collection do
         get :groups

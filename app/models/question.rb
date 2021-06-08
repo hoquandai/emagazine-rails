@@ -46,7 +46,7 @@ class Question < ApplicationRecord
       id: id,
       excerpt: excerpt,
       content: content,
-      created_at: created_at,
+      created_at: created_at.strftime('%H:%M %d %B, %Y'),
       creator: user,
       category: category,
       tags: tags,

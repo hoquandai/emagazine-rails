@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     resource :user, only: [:show, :update] do
       collection do
         get :ranking
+        get :list
       end
     end
     resources :comments

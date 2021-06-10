@@ -10,7 +10,11 @@ class UsersController < ApplicationController
   end
 
   def update
-    if current_user.update(user_params)
+    target = User.find_by(id: user_params[:id])
+    managable = current_user.is_admin || current_user == target
+    puts target.inspect
+    update_params = current_user.is_admin ? user_params : user_params.except(:is_admin)
+    if managable && target.update(update_params)
       render :show
     else
       render json: { errors: current_user.errors }, status: :unprocessable_entity
@@ -22,9 +26,14 @@ class UsersController < ApplicationController
     render_ok(data: users)
   end
 
+  def list
+    users = User.all
+    render_ok(data: users)
+  end
+
   protected
 
   def user_params
-    params.require(:user).permit(:name, :password, :email, :avatar)
+    params.require(:user).permit(:id, :name, :password, :email, :avatar, :is_admin)
   end
 end

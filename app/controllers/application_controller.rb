@@ -44,4 +44,8 @@ class ApplicationController < ActionController::Base
   def signed_in?
     @current_user_id.present?
   end
+
+  def admin?
+    render_error(error: 'Action nor allowed!', status: 422) unless current_user.is_admin
+  end
 end

@@ -1,5 +1,14 @@
 class QuestionsController < ApplicationController
-  before_action :authenticate_user, only: [:create]
+  before_action :authenticate_user, only: [:create, :destroy, :update]
+
+  def index
+    question = Question.all
+    if question
+      render_ok(data: question)
+    else
+      render_error(message: 'Failed to load questions')
+    end
+  end
 
   def create
     question = Question.new(question_params)
@@ -8,6 +17,24 @@ class QuestionsController < ApplicationController
       render_ok(data: question)
     else
       render_error(message: question.errors.messages)
+    end
+  end
+
+  def update
+    question = Question.find_by(id: params[:id])
+    if current_user == question.user && question.update(question_params)
+      render_ok(data: question)
+    else
+      render_error(message: question.errors.message)
+    end
+  end
+
+  def destroy
+    question = Question.find_by(id: params[:id])
+    if (current_user == question.user || current_user.is_admin) && question.destroy
+      render_ok(data: question)
+    else
+      render_error(message: question.errors.message)
     end
   end
 
@@ -86,6 +113,6 @@ class QuestionsController < ApplicationController
   private
 
   def question_params
-    params.require(:question).permit(:excerpt, :content, :category_id, :user_id, :tag_list, :image)
+    params.require(:question).permit(:excerpt, :content, :category_id, :user_id, :tag_list, :image, :visible)
   end
 end

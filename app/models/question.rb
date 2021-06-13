@@ -29,9 +29,9 @@ class Question < ApplicationRecord
 
   belongs_to :category
   belongs_to :user
-  has_many :votes, as: :votable
-  has_many :comments
-  has_one_attached :image
+  has_many :votes, as: :votable, dependent: :destroy
+  has_many :comments, dependent: :destroy
+  has_one_attached :image, dependent: :destroy
 
   scope :hot, lambda {
     Question.left_joins(:votes).group(:id).order('COUNT(votes.votable_id) DESC')
@@ -51,7 +51,8 @@ class Question < ApplicationRecord
       category: category,
       tags: tags,
       likes: votes.size,
-      image: image.attached? ? rails_blob_path(image, only_path: true) : DEFAULT_IMAGE
+      image: image.attached? ? rails_blob_path(image, only_path: true) : DEFAULT_IMAGE,
+      visible: visible
     }
   end
 end

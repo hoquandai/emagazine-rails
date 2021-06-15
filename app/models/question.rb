@@ -41,6 +41,12 @@ class Question < ApplicationRecord
     Question.left_joins(:comments).group(:id).order('COUNT(comments.question_id) DESC')
   }
 
+  scope :search, lambda { |keyword|
+    return Question.all if keyword.blank?
+
+    Question.where('excerpt LIKE ?', keyword).or(Question.where('content LIKE ?', keyword))
+  }
+
   def as_json(data = {})
     {
       id: id,

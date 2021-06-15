@@ -24,6 +24,7 @@ Rails.application.routes.draw do
         get :tag
         get :interactive
         get :top_tagging
+        get :search
       end
     end
     resources :votes do

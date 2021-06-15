@@ -57,6 +57,14 @@ class QuestionsController < ApplicationController
     render_ok(data: data)
   end
 
+  def search
+    authenticate_user if params[:authenticated]
+    questions = Question.search(params[:q]).order(created_at: :desc)
+    likes = Vote.where(voter_id: @current_user_id)
+    data = { questions: questions, likes: likes.pluck(:votable_id) }
+    render_ok(data: data)
+  end
+
   def trending_tags
     tags = ActsAsTaggableOn::Tag.most_used(10)
     if tags

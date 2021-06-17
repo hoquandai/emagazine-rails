@@ -2,7 +2,16 @@ class QuestionsController < ApplicationController
   before_action :authenticate_user, only: [:create, :destroy, :update]
 
   def index
-    question = Question.all
+    question = Question.list.all
+    if question
+      render_ok(data: question)
+    else
+      render_error(message: 'Failed to load questions')
+    end
+  end
+
+  def admin
+    question = Question.unscoped.list.all
     if question
       render_ok(data: question)
     else
@@ -14,6 +23,7 @@ class QuestionsController < ApplicationController
     question = Question.new(question_params)
 
     if question.save
+      VerifyQuestionJob.perform_later(question)
       render_ok(data: question)
     else
       render_error(message: question.errors.messages)
@@ -21,20 +31,21 @@ class QuestionsController < ApplicationController
   end
 
   def update
-    question = Question.find_by(id: params[:id])
-    if current_user == question.user && question.update(question_params)
+    question = Question.unscoped.find_by(id: params[:id])
+    if (current_user == question.user || current_user.is_admin) && question.update(question_params)
+      VerifyQuestionJob.perform_later(question) unless current_user.is_admin
       render_ok(data: question)
     else
-      render_error(message: question.errors.message)
+      render_error(message: question.errors.messages)
     end
   end
 
   def destroy
-    question = Question.find_by(id: params[:id])
+    question = Question.unscoped.find_by(id: params[:id])
     if (current_user == question.user || current_user.is_admin) && question.destroy
       render_ok(data: question)
     else
-      render_error(message: question.errors.message)
+      render_error(message: question.errors.messages)
     end
   end
 
@@ -42,8 +53,9 @@ class QuestionsController < ApplicationController
     authenticate_user if params[:authenticated]
     question = Question.find_by(id: params[:id])
     liked = Vote.exists?(voter_id: @current_user_id, votable: question)
+    reported = Report.exists?(reporter_id: @current_user_id, reportable: question)
     if question
-      render_ok(data: question.as_json.merge(liked: liked, comments: question.comments))
+      render_ok(data: question.as_json.merge(liked: liked, comments: question.comments, reported: reported))
     else
       render_error(message: 'Not Found', status: 404)
     end
@@ -51,7 +63,7 @@ class QuestionsController < ApplicationController
 
   def latest
     authenticate_user if params[:authenticated]
-    questions = Question.limit(4).order(created_at: :desc)
+    questions = Question.list.limit(4).order(created_at: :desc)
     likes = Vote.where(voter_id: @current_user_id)
     data = { questions: questions, likes: likes.pluck(:votable_id) }
     render_ok(data: data)
@@ -59,7 +71,7 @@ class QuestionsController < ApplicationController
 
   def search
     authenticate_user if params[:authenticated]
-    questions = Question.search(params[:q]).order(created_at: :desc)
+    questions = Question.list.search(params[:q]).order(created_at: :desc)
     likes = Vote.where(voter_id: @current_user_id)
     data = { questions: questions, likes: likes.pluck(:votable_id) }
     render_ok(data: data)
@@ -75,7 +87,7 @@ class QuestionsController < ApplicationController
   end
 
   def hot
-    questions = Question.hot.limit(6)
+    questions = Question.list.hot.limit(6)
     if questions
       render_ok(data: questions)
     else
@@ -84,7 +96,7 @@ class QuestionsController < ApplicationController
   end
 
   def interactive
-    questions = Question.interactive.limit(5)
+    questions = Question.list.interactive.limit(5)
     if questions
       render_ok(data: questions)
     else
@@ -94,7 +106,7 @@ class QuestionsController < ApplicationController
 
   def top_tagging
     tag_names = ActsAsTaggableOn::Tag.most_used(1).map(&:name)
-    questions = Question.tagged_with(tag_names).limit(4)
+    questions = Question.list.tagged_with(tag_names).limit(4)
     if questions
       render_ok(data: questions)
     else
@@ -112,7 +124,7 @@ class QuestionsController < ApplicationController
 
   def tag
     authenticate_user if params[:authenticated]
-    questions = Question.tagged_with(params[:tag])
+    questions = Question.list.tagged_with(params[:tag])
     likes = Vote.where(voter_id: @current_user_id, votable_id: questions.ids)
     data = { questions: questions, likes: likes.pluck(:votable_id) }
     render_ok(data: data)

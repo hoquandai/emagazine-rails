@@ -25,11 +25,14 @@ class Question < ApplicationRecord
   include Rails.application.routes.url_helpers
   DEFAULT_IMAGE = ActionController::Base.helpers.asset_path 'img04.jpg'
 
+  default_scope { where(visible: true) }
+
   acts_as_taggable
 
   belongs_to :category
   belongs_to :user
   has_many :votes, as: :votable, dependent: :destroy
+  has_many :reports, as: :reportable, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_one_attached :image, dependent: :destroy
 
@@ -47,6 +50,10 @@ class Question < ApplicationRecord
     Question.where('excerpt LIKE ?', keyword).or(Question.where('content LIKE ?', keyword))
   }
 
+  scope :list, lambda {
+    includes(:user, :category, :votes, :tags)
+  }
+
   def as_json(data = {})
     {
       id: id,
@@ -57,6 +64,7 @@ class Question < ApplicationRecord
       category: category,
       tags: tags,
       likes: votes.size,
+      reports: reports.size,
       image: image.attached? ? rails_blob_path(image, only_path: true) : DEFAULT_IMAGE,
       visible: visible
     }

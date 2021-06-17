@@ -18,4 +18,19 @@
 class Report < ApplicationRecord
   belongs_to :reporter, polymorphic: true
   belongs_to :reportable, polymorphic: true
+
+  after_create :increase_score
+  after_destroy :decrease_score
+
+  private
+
+  def increase_score
+    reportable.user.score = reportable.user.score + 1
+    reportable.user.save
+  end
+
+  def decrease_score
+    reportable.user.score = reportable.user.score - 1
+    reportable.user.save
+  end
 end

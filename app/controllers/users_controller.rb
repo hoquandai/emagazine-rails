@@ -5,7 +5,6 @@ class UsersController < ApplicationController
     user = User.find_by(id: params[:id])
     questions = user.questions
     votes = Vote.where(votable_type: 'Question', votable_id: questions.ids).size
-    puts "=========", { user: user.as_json, questions: questions, stars: votes }
     render_ok(data: { user: user.as_json, questions: questions, stars: votes })
   end
 

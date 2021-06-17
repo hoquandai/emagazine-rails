@@ -24,5 +24,19 @@ module EmagazineRails
         resource '*', :headers => :any, :methods => [:get, :post, :options]
       end
     end
+
+    redis_path = ENV['REDIS_CACHE_PATH'] || '/0/cache'
+    redis_host = ENV['REDIS_HOST'] || ''
+    config.redis_url = File.join(redis_host, redis_path)
+    cache_servers = [config.redis_url]
+
+    config.cache_store = :redis_cache_store, {
+      url: cache_servers,
+
+      connect_timeout: 30,
+      expires_in: 6.hours,
+      race_condition_ttl: 3.seconds
+    }
+    config.active_job.queue_adapter = :sidekiq
   end
 end

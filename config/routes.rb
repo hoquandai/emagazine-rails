@@ -25,9 +25,15 @@ Rails.application.routes.draw do
         get :interactive
         get :top_tagging
         get :search
+        get :admin
       end
     end
     resources :votes do
+      collection do
+        delete :remove
+      end
+    end
+    resources :reports do
       collection do
         delete :remove
       end

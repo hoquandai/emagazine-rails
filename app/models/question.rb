@@ -51,7 +51,7 @@ class Question < ApplicationRecord
   }
 
   scope :list, lambda {
-    includes(:user, :category, :votes, :tags)
+    includes(:user, :category, :votes, :tags, image_attachment: :blob)
   }
 
   def as_json(data = {})

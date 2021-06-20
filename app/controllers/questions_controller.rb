@@ -24,6 +24,7 @@ class QuestionsController < ApplicationController
 
     if question.save
       VerifyQuestionJob.perform_later(question)
+      MailJob.perform_later(question)
       render_ok(data: question)
     else
       render_error(message: question.errors.messages)

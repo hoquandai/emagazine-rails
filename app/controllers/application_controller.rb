@@ -6,11 +6,11 @@ class ApplicationController < ActionController::Base
   protected
 
   def render_ok(data: {})
-    render json: { message: 'OK', data: data }, status: 200
+    render json: { message: 'OK', data: data, status: 200 }, status: 200
   end
 
   def render_error(status: 400, message: 'Failed', data: {})
-    render json: { error: message, data: data }, status: status
+    render json: { error: message, data: data, status: status }, status: status
   end
 
   private

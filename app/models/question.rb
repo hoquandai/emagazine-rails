@@ -47,7 +47,7 @@ class Question < ApplicationRecord
   scope :search, lambda { |keyword|
     return Question.all if keyword.blank?
 
-    Question.where('excerpt LIKE ?', keyword).or(Question.where('content LIKE ?', keyword))
+    Question.where('excerpt LIKE ?', "%#{keyword}%").or(Question.where('content LIKE ?', "%#{keyword}%"))
   }
 
   scope :list, lambda {
